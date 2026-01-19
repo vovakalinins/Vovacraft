@@ -11,6 +11,8 @@ find_package(glm REQUIRED)
 set(SOURCES 
     src/main.cpp 
     src/glad.c
+    src/render.cpp
+    src/shader.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
