@@ -6,6 +6,7 @@
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
+    glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
 }
 
@@ -17,12 +18,14 @@ void processInput(GLFWwindow *window)
 
 int main()
 {
+    int width = 800, height = 600;
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    GLFWwindow *window = glfwCreateWindow(800, 600, "Vovacraft", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(width, height, "Vovacraft", NULL, NULL);
+
     if (window == NULL)
     {
         std::cout << "Failed to create glfw window" << std::endl;
@@ -39,10 +42,12 @@ int main()
         return -1;
     }
 
-    glViewport(0, 0, 800, 600);
+    glfwGetFramebufferSize(window, &width, &height);
+    glViewport(0, 0, width, height);
 
     unsigned int shaderProgram = initShaderProgram();
     unsigned int VAO = initVAO();
+    unsigned int EBO = initEBO();
 
     while (!glfwWindowShouldClose(window))
     {
@@ -53,11 +58,17 @@ int main()
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    glDeleteVertexArrays(1, &VAO);
+    
+    // glDeleteBuffers(1, &VBO);
+    glDeleteProgram(shaderProgram);
 
     glfwTerminate();
     return 0;
