@@ -1,8 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "shader.h"
-#include "render.h"
+#include "graphics/shader.h"
+#include "graphics/render.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
@@ -68,6 +68,8 @@ int main()
     glDeleteVertexArrays(1, &VAO);
     
     // glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    
     glDeleteProgram(shaderProgram);
 
     glfwTerminate();

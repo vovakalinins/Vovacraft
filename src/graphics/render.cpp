@@ -1,11 +1,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "shader.h"
+#include "graphics/shader.h"
 
 float vertices[] = {
      0.5f,  0.5f, 0.0f,  // top right
      0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f, -0.5f, 0.0f,  // bottom left 
     -0.5f,  0.5f, 0.0f   // top left 
 };
 unsigned int indices[] = {  // note that we start from 0!
@@ -29,6 +29,8 @@ unsigned int initVAO()
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
+
+    glDeleteBuffers(1, &VBO);
     return VAO;
 }
 

@@ -11,8 +11,8 @@ find_package(glm REQUIRED)
 set(SOURCES 
     src/main.cpp 
     src/glad.c
-    src/render.cpp
-    src/shader.cpp
+    src/graphics/render.cpp
+    src/graphics/shader.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -36,3 +36,6 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
+
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets" 
+     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
