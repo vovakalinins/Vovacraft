@@ -60,8 +60,8 @@ int main()
     glfwGetFramebufferSize(window, &state.screenWidth, &state.screenHeight);
     glViewport(0, 0, state.screenWidth, state.screenHeight);
 
-    unsigned int VAO = initVAO();
-    unsigned int EBO = initEBO();
+    // unsigned int VAO = initVAO();
+    // unsigned int EBO = initEBO();
 
     glEnable(GL_DEPTH_TEST);
 
@@ -102,11 +102,11 @@ int main()
 
         ourShader.setMat4("projection", projection);
 
-        glBindVertexArray(VAO);
+        // glBindVertexArray(VAO);
 
-        chunk.render(ourShader.ID, VAO);
+        chunk.render(ourShader.ID);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -114,9 +114,9 @@ int main()
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &VAO);
+    // glDeleteVertexArrays(1, &VAO);
 
-    glDeleteBuffers(1, &EBO);
+    // glDeleteBuffers(1, &EBO);
 
     glDeleteProgram(ourShader.ID);
 

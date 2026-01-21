@@ -36,4 +36,7 @@ void processInput(GLFWwindow *window)
         state.camera.ProcessKeyboard(LEFT, state.deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         state.camera.ProcessKeyboard(RIGHT, state.deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        state.camera.ProcessKeyboard(RIGHT, state.deltaTime);
 }
