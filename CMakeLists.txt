@@ -11,8 +11,15 @@ find_package(glm REQUIRED)
 set(SOURCES 
     src/main.cpp 
     src/glad.c
-    src/graphics/render.cpp
-    src/graphics/shader.cpp
+    src/graphics/mesh.cpp
+    src/graphics/texture.cpp
+    include/graphics/camera.h
+    include/core/GameState.h
+    src/core/GameState.cpp
+    include/core/input.h
+    src/core/input.cpp
+    src/world/chunk.cpp
+    include/world/chunk.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
