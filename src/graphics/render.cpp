@@ -33,7 +33,7 @@ unsigned int initVAO()
 
     // glBindVertexArray(0);
 
-    glDeleteBuffers(1, &VBO);
+    // glDeleteBuffers(1, &VBO);
     return VAO;
 }
 
