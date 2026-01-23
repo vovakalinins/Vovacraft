@@ -74,12 +74,11 @@ int main()
     // ourShader.setInt("texture2", 1);
 
     // Chunk chunk(glm::vec3(0,0,0));
-    World world;
-    WorldGenerator::generateFlatWorld(world, 2, 2);
+    WorldGenerator::generateFlatWorld(state.world, 2, 2);
 
     Renderer renderer;
 
-    renderer.updateMeshes(world);
+    renderer.updateMeshes(state.world);
 
     // camera
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -91,7 +90,7 @@ int main()
 
         processInput(window);
 
-        PlayerMovement::update(state.player, world, state.deltaTime);
+        PlayerMovement::update(state.player, state.world, state.deltaTime);
         // PlayerMovement::applyGravity(state.player, world, state.deltaTime);
 
         glClearColor(73.0f / 255.0f, 129.0f / 255.0f, 235.0f / 255.0f, 1.0f);

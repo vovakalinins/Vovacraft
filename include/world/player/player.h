@@ -2,7 +2,8 @@
 #include <glm/glm.hpp>
 #include "graphics/camera.h"
 
-class Player {
+class Player
+{
 public:
     glm::vec3 position;
     glm::vec3 velocity;
@@ -14,6 +15,13 @@ public:
     float eyeHeight = 1.6f;
 
     float weight = 100.0f;
+
+    int gameMode = 0; // 0s 1c
+    int health = 20;
+
+    bool isFlying = false;
+    bool isSneaking = false;
+    bool isRunning = false;
 
     Player(glm::vec3 startPos);
 

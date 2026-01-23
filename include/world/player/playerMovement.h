@@ -4,15 +4,21 @@
 
 namespace PlayerMovement
 {
-    const float SPEED = 16.0f;
+    const float WALK_SPEED = 43.0f;
+    const float SPRINT_SPEED = 56.0f;
+    const float SNEAK_SPEED = 13.0f;
+    const float JUMP_FORCE = 8.5f;
+
     const float MOUSE_SENSITIVITY = 0.1f;
 
     void moveForward(Player &player, float deltaTime);
     void moveBackward(Player &player, float deltaTime);
     void moveLeft(Player &player, float deltaTime);
     void moveRight(Player &player, float deltaTime);
-    void flyUp(Player &player, float deltaTime);   // Placeholder for Jump
-    void flyDown(Player &player, float deltaTime); // Placeholder for Crouch
+    void flyUp(Player &player, float deltaTime);
+    void flyDown(Player &player, float deltaTime);
+    void jump(Player &player, const World &world);
+    void sneak(Player &player, const World &world);
 
     void look(Player &player, float xOffset, float yOffset);
 

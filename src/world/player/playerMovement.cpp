@@ -22,32 +22,51 @@ glm::vec3 getBodyRight(const Player &player)
 
 void PlayerMovement::moveForward(Player &player, float deltaTime)
 {
-    player.velocity += getBodyForward(player) * SPEED * deltaTime;
+    // add sprint
+    float currentSpeed = PlayerMovement::WALK_SPEED;
+
+    player.velocity += getBodyForward(player) * currentSpeed * deltaTime;
 }
 
 void PlayerMovement::moveBackward(Player &player, float deltaTime)
 {
-    player.velocity -= getBodyForward(player) * SPEED * deltaTime;
+    player.velocity -= getBodyForward(player) * PlayerMovement::WALK_SPEED * deltaTime;
 }
 
 void PlayerMovement::moveLeft(Player &player, float deltaTime)
 {
-    player.velocity -= getBodyRight(player) * SPEED * deltaTime;
+    player.velocity -= getBodyRight(player) * PlayerMovement::WALK_SPEED * deltaTime;
 }
 
 void PlayerMovement::moveRight(Player &player, float deltaTime)
 {
-    player.velocity += getBodyRight(player) * SPEED * deltaTime;
+    player.velocity += getBodyRight(player) * PlayerMovement::WALK_SPEED * deltaTime;
 }
 
 void PlayerMovement::flyUp(Player &player, float deltaTime)
 {
-    player.velocity.y += SPEED * deltaTime;
+    player.velocity.y += PlayerMovement::WALK_SPEED * deltaTime;
+}
+
+void PlayerMovement::jump(Player &player, const World &world)
+{
+    if (isOnGround(player, world) && std::abs(player.velocity.y) < 0.01f)
+    {
+        player.velocity.y = JUMP_FORCE;
+    }
+}
+
+void PlayerMovement::sneak(Player &player, const World &world)
+{
+    if (isOnGround(player, world))
+    {
+        player.velocity.y = JUMP_FORCE;
+    }
 }
 
 void PlayerMovement::flyDown(Player &player, float deltaTime)
 {
-    player.velocity.y -= SPEED * deltaTime;
+    player.velocity.y -= PlayerMovement::WALK_SPEED * deltaTime;
 }
 
 void PlayerMovement::look(Player &player, float xOffset, float yOffset)
@@ -76,7 +95,7 @@ bool PlayerMovement::isOnGround(Player &player, const World &world)
         return false;
 
     int localX = ix - chunk->position.x;
-    int localY = iy; 
+    int localY = iy;
     int localZ = iz - chunk->position.z;
 
     if (localY < 0 || localY >= CHUNK_SIZE)
@@ -91,7 +110,7 @@ void PlayerMovement::applyGravity(Player &player, const World &world, float delt
 {
     if (!isOnGround(player, world))
     {
-        player.velocity.y -= 15.0f * deltaTime;
+        player.velocity.y -= 32.0f * deltaTime;
     }
     else
     {

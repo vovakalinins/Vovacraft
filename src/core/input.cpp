@@ -7,14 +7,15 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
-    if (state.firstMouse) {
+    if (state.firstMouse)
+    {
         state.lastX = xpos;
         state.lastY = ypos;
         state.firstMouse = false;
     }
 
     float xoffset = xpos - state.lastX;
-    float yoffset = state.lastY - ypos; 
+    float yoffset = state.lastY - ypos;
     state.lastX = xpos;
     state.lastY = ypos;
 
@@ -36,10 +37,25 @@ void processInput(GLFWwindow *window)
         PlayerMovement::moveLeft(state.player, state.deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         PlayerMovement::moveRight(state.player, state.deltaTime);
-        
+
     // Debug Fly
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        PlayerMovement::flyUp(state.player, state.deltaTime);
+    {
+        if (state.player.gameMode == 1)
+        {
+            PlayerMovement::flyUp(state.player, state.deltaTime);
+            return;
+        }
+        PlayerMovement::jump(state.player, state.world);
+    }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        PlayerMovement::flyDown(state.player, state.deltaTime);
+    {
+        if (state.player.gameMode == 1)
+        {
+            PlayerMovement::flyDown(state.player, state.deltaTime);
+            return;
+        }
+    }
+
+    // state.player.isSneaking = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
 }

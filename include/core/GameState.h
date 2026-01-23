@@ -2,6 +2,7 @@
 #pragma once
 
 #include "world/player/player.h"
+#include "world/world/world.h"
 // #include <glm/glm.hpp>
 
 struct GameState
@@ -12,6 +13,7 @@ struct GameState
 
     // Camera/Player
     Player player;
+    World world;
     float lastX = 400.0f;
     float lastY = 300.0f;
     bool firstMouse = true;
