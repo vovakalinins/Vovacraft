@@ -1,0 +1,124 @@
+#include "world/player/playerMovement.h"
+#include <glm/glm.hpp>
+#include <cmath>
+#include "world/physics/gravity.h"
+#include "world/player/player.h"
+#include "world/chunk/chunk.h"
+
+glm::vec3 getBodyForward(const Player &player)
+{
+    glm::vec3 front;
+    front.x = cos(glm::radians(player.yaw));
+    front.y = 0.0f;
+    front.z = sin(glm::radians(player.yaw));
+    return glm::normalize(front);
+}
+
+glm::vec3 getBodyRight(const Player &player)
+{
+    glm::vec3 forward = getBodyForward(player);
+    return glm::normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
+}
+
+void PlayerMovement::moveForward(Player &player, float deltaTime)
+{
+    player.velocity += getBodyForward(player) * SPEED * deltaTime;
+}
+
+void PlayerMovement::moveBackward(Player &player, float deltaTime)
+{
+    player.velocity -= getBodyForward(player) * SPEED * deltaTime;
+}
+
+void PlayerMovement::moveLeft(Player &player, float deltaTime)
+{
+    player.velocity -= getBodyRight(player) * SPEED * deltaTime;
+}
+
+void PlayerMovement::moveRight(Player &player, float deltaTime)
+{
+    player.velocity += getBodyRight(player) * SPEED * deltaTime;
+}
+
+void PlayerMovement::flyUp(Player &player, float deltaTime)
+{
+    player.velocity.y += SPEED * deltaTime;
+}
+
+void PlayerMovement::flyDown(Player &player, float deltaTime)
+{
+    player.velocity.y -= SPEED * deltaTime;
+}
+
+void PlayerMovement::look(Player &player, float xOffset, float yOffset)
+{
+    player.yaw += xOffset * MOUSE_SENSITIVITY;
+
+    player.pitch += yOffset * MOUSE_SENSITIVITY;
+
+    if (player.pitch > 89.0f)
+        player.pitch = 89.0f;
+    if (player.pitch < -89.0f)
+        player.pitch = -89.0f;
+}
+
+bool PlayerMovement::isOnGround(Player &player, const World &world)
+{
+    float checkY = player.position.y - 0.1f;
+
+    int ix = std::floor(player.position.x);
+    int iy = std::floor(checkY);
+    int iz = std::floor(player.position.z);
+
+    auto chunk = world.getChunk(glm::ivec3(ix, iy, iz));
+
+    if (chunk == nullptr)
+        return false;
+
+    int localX = ix - chunk->position.x;
+    int localY = iy; 
+    int localZ = iz - chunk->position.z;
+
+    if (localY < 0 || localY >= CHUNK_SIZE)
+        return false;
+
+    unsigned char blockType = chunk->getBlock(localX, localY, localZ);
+
+    return blockType != 0;
+}
+
+void PlayerMovement::applyGravity(Player &player, const World &world, float deltaTime)
+{
+    if (!isOnGround(player, world))
+    {
+        player.velocity.y -= 15.0f * deltaTime;
+    }
+    else
+    {
+        if (player.velocity.y < 0)
+        {
+            player.velocity.y = 0;
+            player.position.y = std::round(player.position.y);
+        }
+    }
+}
+
+void PlayerMovement::update(Player &player, const World &world, float deltaTime)
+{
+    glm::vec3 horizontalVel = glm::vec3(player.velocity.x, 0.0f, player.velocity.z);
+    float verticalVel = player.velocity.y;
+
+    float drag = 10.0f;
+    horizontalVel -= horizontalVel * drag * deltaTime;
+
+    if (glm::length(horizontalVel) < 0.1f)
+        horizontalVel = glm::vec3(0.0f);
+
+    player.velocity = glm::vec3(horizontalVel.x, verticalVel, horizontalVel.z);
+
+    applyGravity(player, world, deltaTime);
+
+    player.position += player.velocity * deltaTime;
+
+    player.syncCamera();
+}

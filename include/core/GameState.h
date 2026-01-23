@@ -1,27 +1,29 @@
 
 #pragma once
 
-#include "graphics/camera.h"
-#include <glm/glm.hpp>
+#include "world/player/player.h"
+// #include <glm/glm.hpp>
 
-struct GameState {
+struct GameState
+{
     // Timing
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
     // Camera/Player
-    Camera camera;
+    Player player;
     float lastX = 400.0f;
     float lastY = 300.0f;
     bool firstMouse = true;
 
-    // Window settings
     int screenWidth = 800;
     int screenHeight = 600;
 
-    // Constructor to initialize camera position
-    GameState() : camera(glm::vec3(0.0f, 0.0f, 3.0f)) {}
+    GameState() : player(glm::vec3(8.0f, 10.0f, 8.0f))
+    {
+        // player.pitch = -45.0f;
+        // player.syncCamera();
+    }
 };
 
-// Declare a global instance so other files can see it
 extern GameState state;

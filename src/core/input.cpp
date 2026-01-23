@@ -1,26 +1,25 @@
+#include "core/input.h"
 #include "core/GameState.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "world/player/playerMovement.h" // Include the logic
 
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
 {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
-    if (state.firstMouse)
-    {
+    if (state.firstMouse) {
         state.lastX = xpos;
         state.lastY = ypos;
         state.firstMouse = false;
     }
 
     float xoffset = xpos - state.lastX;
-    float yoffset = state.lastY - ypos; // reversed since y-coordinates go from bottom to top
-
+    float yoffset = state.lastY - ypos; 
     state.lastX = xpos;
     state.lastY = ypos;
 
-    state.camera.ProcessMouseMovement(xoffset, yoffset);
+    // Delegate to Logic System
+    PlayerMovement::look(state.player, xoffset, yoffset);
 }
 
 void processInput(GLFWwindow *window)
@@ -28,15 +27,19 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
+    // Map Keys to Logic Functions
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        state.camera.ProcessKeyboard(FORWARD, state.deltaTime);
+        PlayerMovement::moveForward(state.player, state.deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        state.camera.ProcessKeyboard(BACKWARD, state.deltaTime);
+        PlayerMovement::moveBackward(state.player, state.deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        state.camera.ProcessKeyboard(LEFT, state.deltaTime);
+        PlayerMovement::moveLeft(state.player, state.deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        state.camera.ProcessKeyboard(RIGHT, state.deltaTime);
-
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        state.camera.ProcessKeyboard(RIGHT, state.deltaTime);
+        PlayerMovement::moveRight(state.player, state.deltaTime);
+        
+    // Debug Fly
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        PlayerMovement::flyUp(state.player, state.deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        PlayerMovement::flyDown(state.player, state.deltaTime);
 }
