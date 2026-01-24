@@ -14,6 +14,8 @@ public:
     Camera camera;
     float eyeHeight = 1.6f;
 
+    float height = 1.8f;
+    float width = 0.6f;
     float weight = 100.0f;
 
     int gameMode = 0; // 0s 1c

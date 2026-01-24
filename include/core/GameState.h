@@ -5,27 +5,25 @@
 #include "world/world/world.h"
 // #include <glm/glm.hpp>
 
-struct GameState
-{
-    // Timing
-    float deltaTime = 0.0f;
-    float lastFrame = 0.0f;
+struct GameState {
+  // Timing
+  float deltaTime = 0.0f;
+  float lastFrame = 0.0f;
 
-    // Camera/Player
-    Player player;
-    World world;
-    float lastX = 400.0f;
-    float lastY = 300.0f;
-    bool firstMouse = true;
+  // Camera/Player
+  Player player;
+  World world;
+  float lastX = 400.0f;
+  float lastY = 300.0f;
+  bool firstMouse = true;
 
-    int screenWidth = 800;
-    int screenHeight = 600;
+  int screenWidth = 800;
+  int screenHeight = 600;
 
-    GameState() : player(glm::vec3(8.0f, 10.0f, 8.0f))
-    {
-        // player.pitch = -45.0f;
-        // player.syncCamera();
-    }
+  GameState() : player(glm::vec3(8.0f, 10.0f, 8.0f)) {
+    // player.pitch = -45.0f;
+    // player.syncCamera();
+  }
 };
 
 extern GameState state;

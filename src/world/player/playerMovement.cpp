@@ -45,7 +45,7 @@ void PlayerMovement::moveRight(Player &player, float deltaTime)
 
 void PlayerMovement::flyUp(Player &player, float deltaTime)
 {
-    player.velocity.y += PlayerMovement::WALK_SPEED * deltaTime;
+    player.velocity.y += PlayerMovement::FLY_SPEED * deltaTime;
 }
 
 void PlayerMovement::jump(Player &player, const World &world)
@@ -66,7 +66,7 @@ void PlayerMovement::sneak(Player &player, const World &world)
 
 void PlayerMovement::flyDown(Player &player, float deltaTime)
 {
-    player.velocity.y -= PlayerMovement::WALK_SPEED * deltaTime;
+    player.velocity.y -= PlayerMovement::FLY_SPEED * deltaTime;
 }
 
 void PlayerMovement::look(Player &player, float xOffset, float yOffset)
@@ -122,6 +122,44 @@ void PlayerMovement::applyGravity(Player &player, const World &world, float delt
     }
 }
 
+bool checkCollision(const Player &player, const World &world, glm::vec3 offset)
+{
+    glm::vec3 targetPos = player.position + offset;
+
+    int minX = std::floor(targetPos.x - player.width / 2);
+    int maxX = std::floor(targetPos.x + player.width / 2);
+    int minY = std::floor(targetPos.y);
+    int maxY = std::floor(targetPos.y + player.height);
+    int minZ = std::floor(targetPos.z - player.width / 2);
+    int maxZ = std::floor(targetPos.z + player.width / 2);
+
+    for (int x = minX; x <= maxX; x++)
+    {
+        for (int y = minY; y < maxY; y++)
+        {
+            for (int z = minZ; z <= maxZ; z++)
+            {
+                auto chunk = world.getChunk(glm::ivec3(x, y, z));
+                if (chunk)
+                {
+                    int lx = x - chunk->position.x;
+                    int ly = y; 
+                    int lz = z - chunk->position.z;
+
+                    if (ly >= 0 && ly < CHUNK_SIZE)
+                    {
+                        if (chunk->getBlock(lx, ly, lz) != 0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
 void PlayerMovement::update(Player &player, const World &world, float deltaTime)
 {
     glm::vec3 horizontalVel = glm::vec3(player.velocity.x, 0.0f, player.velocity.z);
@@ -133,11 +171,53 @@ void PlayerMovement::update(Player &player, const World &world, float deltaTime)
     if (glm::length(horizontalVel) < 0.1f)
         horizontalVel = glm::vec3(0.0f);
 
+    if (player.gameMode == 0)
+    {
+        applyGravity(player, world, deltaTime);
+
+        verticalVel = player.velocity.y;
+    }
+    else if (player.gameMode == 1)
+    {
+        verticalVel -= verticalVel * deltaTime;
+
+        if (std::abs(verticalVel) < 0.1f)
+            verticalVel = 0.0f;
+    }
+
     player.velocity = glm::vec3(horizontalVel.x, verticalVel, horizontalVel.z);
 
-    applyGravity(player, world, deltaTime);
+    float moveX = player.velocity.x * deltaTime;
+    if (checkCollision(player, world, glm::vec3(moveX, 0, 0)))
+    {
+        player.velocity.x = 0;
+        moveX = 0;
+    }
+    player.position.x += moveX;
 
-    player.position += player.velocity * deltaTime;
+    float moveZ = player.velocity.z * deltaTime;
+    if (checkCollision(player, world, glm::vec3(0, 0, moveZ)))
+    {
+        player.velocity.z = 0;
+        moveZ = 0;
+    }
+    player.position.z += moveZ;
+
+    float moveY = player.velocity.y * deltaTime;
+    if (checkCollision(player, world, glm::vec3(0, moveY, 0)))
+    {
+        if (player.velocity.y < 0)
+        {
+            player.velocity.y = 0;
+            player.position.y = std::round(player.position.y);
+        }
+        else
+        {
+            player.velocity.y = 0;
+        }
+        moveY = 0;
+    }
+    player.position.y += moveY;
 
     player.syncCamera();
 }

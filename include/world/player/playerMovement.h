@@ -8,6 +8,7 @@ namespace PlayerMovement
     const float SPRINT_SPEED = 56.0f;
     const float SNEAK_SPEED = 13.0f;
     const float JUMP_FORCE = 8.5f;
+    const float FLY_SPEED = 10.0f;
 
     const float MOUSE_SENSITIVITY = 0.1f;
 

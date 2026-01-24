@@ -38,7 +38,7 @@ set(SOURCES
     src/world/player/playerMovement.cpp
     src/world/physics/gravity.cpp
     include/world/physics/gravity.h
-    
+    include/world/data/blocks.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
