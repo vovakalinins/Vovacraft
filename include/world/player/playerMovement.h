@@ -25,6 +25,5 @@ namespace PlayerMovement
 
     void update(Player &player, const World &world, float deltaTime);
 
-    bool isOnGround(Player &player, const World &world);
     void applyGravity(Player &player, const World &world, float deltaTime);
 }

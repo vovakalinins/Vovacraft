@@ -74,7 +74,8 @@ int main()
     // ourShader.setInt("texture2", 1);
 
     // Chunk chunk(glm::vec3(0,0,0));
-    WorldGenerator::generateSeededWorld(state.world, 2, 2, 123456U);
+    WorldGenerator::generateSeededWorld(state.world, 2, 2, 423456U);
+    // WorldGenerator::generateFlatWorld(state.world, 2, 2);
 
     Renderer renderer;
 

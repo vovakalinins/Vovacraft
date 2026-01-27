@@ -10,10 +10,18 @@ void ChunkGenerator::makeFlat(Chunk &chunk)
         {
             for (int y = 0; y < CHUNK_SIZE; y++)
             {
-                if (y == 0)
+                if (y < 3)
                 {
                     chunk.setBlock(x, y, z, Blocks::Dirt);
                 }
+                // beta collision test
+                // else if (y < 5 && y > 2)
+                // {
+                //     if (x == 3)
+                //     {
+                //         chunk.setBlock(x, y, z, Blocks::Dirt);
+                //     }
+                // }
                 else
                 {
                     chunk.setBlock(x, y, z, Blocks::Air);
@@ -47,7 +55,7 @@ void ChunkGenerator::makeSeeded(Chunk &chunk, siv::PerlinNoise perlin)
                 }
                 else if (y == height)
                 {
-                    chunk.setBlock(x, y, z, Blocks::Dirt); 
+                    chunk.setBlock(x, y, z, Blocks::Dirt);
                 }
                 else
                 {

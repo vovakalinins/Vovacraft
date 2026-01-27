@@ -4,6 +4,8 @@
 #include "world/physics/gravity.h"
 #include "world/player/player.h"
 #include "world/chunk/chunk.h"
+#include <iostream>
+#include "world/physics/collisions.h"
 
 glm::vec3 getBodyForward(const Player &player)
 {
@@ -81,31 +83,6 @@ void PlayerMovement::look(Player &player, float xOffset, float yOffset)
         player.pitch = -89.0f;
 }
 
-bool PlayerMovement::isOnGround(Player &player, const World &world)
-{
-    float checkY = player.position.y - 0.1f;
-
-    int ix = std::floor(player.position.x);
-    int iy = std::floor(checkY);
-    int iz = std::floor(player.position.z);
-
-    auto chunk = world.getChunk(glm::ivec3(ix, iy, iz));
-
-    if (chunk == nullptr)
-        return false;
-
-    int localX = ix - chunk->position.x;
-    int localY = iy;
-    int localZ = iz - chunk->position.z;
-
-    if (localY < 0 || localY >= CHUNK_SIZE)
-        return false;
-
-    unsigned char blockType = chunk->getBlock(localX, localY, localZ);
-
-    return blockType != 0;
-}
-
 void PlayerMovement::applyGravity(Player &player, const World &world, float deltaTime)
 {
     if (!isOnGround(player, world))
@@ -122,44 +99,6 @@ void PlayerMovement::applyGravity(Player &player, const World &world, float delt
     }
 }
 
-bool checkCollision(const Player &player, const World &world, glm::vec3 offset)
-{
-    glm::vec3 targetPos = player.position + offset;
-
-    int minX = std::floor(targetPos.x - player.width / 2);
-    int maxX = std::floor(targetPos.x + player.width / 2);
-    int minY = std::floor(targetPos.y);
-    int maxY = std::floor(targetPos.y + player.height);
-    int minZ = std::floor(targetPos.z - player.width / 2);
-    int maxZ = std::floor(targetPos.z + player.width / 2);
-
-    for (int x = minX; x <= maxX; x++)
-    {
-        for (int y = minY; y < maxY; y++)
-        {
-            for (int z = minZ; z <= maxZ; z++)
-            {
-                auto chunk = world.getChunk(glm::ivec3(x, y, z));
-                if (chunk)
-                {
-                    int lx = x - chunk->position.x;
-                    int ly = y; 
-                    int lz = z - chunk->position.z;
-
-                    if (ly >= 0 && ly < CHUNK_SIZE)
-                    {
-                        if (chunk->getBlock(lx, ly, lz) != 0)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return false;
-}
-
 void PlayerMovement::update(Player &player, const World &world, float deltaTime)
 {
     glm::vec3 horizontalVel = glm::vec3(player.velocity.x, 0.0f, player.velocity.z);
@@ -167,6 +106,8 @@ void PlayerMovement::update(Player &player, const World &world, float deltaTime)
 
     float drag = 10.0f;
     horizontalVel -= horizontalVel * drag * deltaTime;
+
+    std::cout << "player pos: " << player.position.x << ", " << player.position.y << ", " << player.position.z << std::endl;
 
     if (glm::length(horizontalVel) < 0.1f)
         horizontalVel = glm::vec3(0.0f);
