@@ -1,59 +1,31 @@
 #include "world/physics/collisions.h"
-#include <iostream>
+#include <cmath>
 
-bool checkCollision(const Player &player, const World &world, glm::vec3 offset)
-{
-    glm::vec3 targetPos = player.position + offset;
+bool checkCollision(const Player& player, const World& world, glm::vec3 offset) {
+    glm::vec3 target = player.position + offset;
+    float hw = player.width / 2.0f;
 
-    float halfWidth = player.width / 2.0f;
-    float playerMinX = targetPos.x - halfWidth;
-    float playerMaxX = targetPos.x + halfWidth;
-    float playerMinY = targetPos.y;
-    float playerMaxY = targetPos.y + player.height;
-    float playerMinZ = targetPos.z - halfWidth;
-    float playerMaxZ = targetPos.z + halfWidth;
+    int minX = (int)std::floor(target.x - hw);
+    int maxX = (int)std::floor(target.x + hw);
+    int minY = (int)std::floor(target.y);
+    int maxY = (int)std::floor(target.y + player.height);
+    int minZ = (int)std::floor(target.z - hw);
+    int maxZ = (int)std::floor(target.z + hw);
 
-    int minBlockX = static_cast<int>(std::round(playerMinX));
-    int maxBlockX = static_cast<int>(std::round(playerMaxX));
-    int minBlockY = static_cast<int>(std::floor(playerMinY));
-    int maxBlockY = static_cast<int>(std::floor(playerMaxY));
-    int minBlockZ = static_cast<int>(std::round(playerMinZ));
-    int maxBlockZ = static_cast<int>(std::round(playerMaxZ));
+    for (int bx = minX; bx <= maxX; bx++) {
+        for (int by = minY; by <= maxY; by++) {
+            for (int bz = minZ; bz <= maxZ; bz++) {
+                if (by < Y_MIN || by > Y_MAX) continue;
+                uint8_t block = world.getBlock(bx, by, bz);
+                if (block != 0 && block != Blocks::WaterStationary && block != Blocks::WaterFlowing) {
+                    float bMinX = bx - 0.5f, bMaxX = bx + 0.5f;
+                    float bMinY = (float)by, bMaxY = (float)(by + 1);
+                    float bMinZ = bz - 0.5f, bMaxZ = bz + 0.5f;
 
-    for (int bx = minBlockX; bx <= maxBlockX; bx++)
-    {
-        for (int by = minBlockY; by <= maxBlockY; by++)
-        {
-            for (int bz = minBlockZ; bz <= maxBlockZ; bz++)
-            {
-                auto chunk = world.getChunk(glm::ivec3(bx, by, bz));
-                if (chunk)
-                {
-                    int lx = bx - chunk->position.x;
-                    int ly = by;
-                    int lz = bz - chunk->position.z;
-
-                    if (ly >= 0 && ly < CHUNK_SIZE)
-                    {
-                        if (chunk->getBlock(lx, ly, lz) != 0)
-                        {
-                            float blockMinX = bx - 0.5f;
-                            float blockMaxX = bx + 0.5f;
-                            float blockMinY = static_cast<float>(by);
-                            float blockMaxY = static_cast<float>(by + 1);
-                            float blockMinZ = bz - 0.5f;
-                            float blockMaxZ = bz + 0.5f;
-
-                            bool overlapX = playerMaxX > blockMinX && playerMinX < blockMaxX;
-                            bool overlapY = playerMaxY > blockMinY && playerMinY < blockMaxY;
-                            bool overlapZ = playerMaxZ > blockMinZ && playerMinZ < blockMaxZ;
-
-                            if (overlapX && overlapY && overlapZ)
-                            {
-                                std::cout << "collisionblock: " << lx << ", " << ly << ", " << lz << std::endl;
-                                return true;
-                            }
-                        }
+                    if (target.x + hw > bMinX && target.x - hw < bMaxX &&
+                        target.y + player.height > bMinY && target.y < bMaxY &&
+                        target.z + hw > bMinZ && target.z - hw < bMaxZ) {
+                        return true;
                     }
                 }
             }
@@ -62,50 +34,27 @@ bool checkCollision(const Player &player, const World &world, glm::vec3 offset)
     return false;
 }
 
-bool isOnGround(Player &player, const World &world)
-{
+bool isOnGround(Player& player, const World& world) {
     float checkY = player.position.y - 0.01f;
+    float hw = player.width / 2.0f;
 
-    float halfWidth = player.width / 2.0f;
-    float minX = player.position.x - halfWidth;
-    float maxX = player.position.x + halfWidth;
-    float minZ = player.position.z - halfWidth;
-    float maxZ = player.position.z + halfWidth;
+    int minX = (int)std::floor(player.position.x - hw);
+    int maxX = (int)std::floor(player.position.x + hw);
+    int by = (int)std::floor(checkY);
+    int minZ = (int)std::floor(player.position.z - hw);
+    int maxZ = (int)std::floor(player.position.z + hw);
 
-    int minBlockX = static_cast<int>(std::round(minX));
-    int maxBlockX = static_cast<int>(std::round(maxX));
-    int blockY = static_cast<int>(std::floor(checkY));
-    int minBlockZ = static_cast<int>(std::round(minZ));
-    int maxBlockZ = static_cast<int>(std::round(maxZ));
+    for (int bx = minX; bx <= maxX; bx++) {
+        for (int bz = minZ; bz <= maxZ; bz++) {
+            if (by < Y_MIN || by > Y_MAX) continue;
+            uint8_t block = world.getBlock(bx, by, bz);
+            if (block != 0 && block != Blocks::WaterStationary && block != Blocks::WaterFlowing) {
+                float bMinX = bx - 0.5f, bMaxX = bx + 0.5f;
+                float bMinZ = bz - 0.5f, bMaxZ = bz + 0.5f;
 
-    for (int bx = minBlockX; bx <= maxBlockX; bx++)
-    {
-        for (int bz = minBlockZ; bz <= maxBlockZ; bz++)
-        {
-            auto chunk = world.getChunk(glm::ivec3(bx, blockY, bz));
-            if (chunk)
-            {
-                int lx = bx - chunk->position.x;
-                int ly = blockY;
-                int lz = bz - chunk->position.z;
-
-                if (ly >= 0 && ly < CHUNK_SIZE)
-                {
-                    if (chunk->getBlock(lx, ly, lz) != 0)
-                    {
-                        float blockMinX = bx - 0.5f;
-                        float blockMaxX = bx + 0.5f;
-                        float blockMinZ = bz - 0.5f;
-                        float blockMaxZ = bz + 0.5f;
-
-                        bool overlapX = maxX > blockMinX && minX < blockMaxX;
-                        bool overlapZ = maxZ > blockMinZ && minZ < blockMaxZ;
-
-                        if (overlapX && overlapZ)
-                        {
-                            return true;
-                        }
-                    }
+                if (player.position.x + hw > bMinX && player.position.x - hw < bMaxX &&
+                    player.position.z + hw > bMinZ && player.position.z - hw < bMaxZ) {
+                    return true;
                 }
             }
         }

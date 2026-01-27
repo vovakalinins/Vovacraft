@@ -1,6 +1,17 @@
 #pragma once
 #include <cstdint>
 
+enum TextureId : uint8_t {
+    TEX_GRASS_TOP = 0,
+    TEX_STONE = 1,
+    TEX_DIRT = 2,
+    TEX_GRASS_SIDE = 3,
+    TEX_COBBLESTONE = 16,
+    TEX_BEDROCK = 17,
+    TEX_WATER_STATIONARY = 223,
+    TEX_SAND = 18,
+};
+
 enum Blocks : uint8_t
 {
     Air = 0,
@@ -31,3 +42,17 @@ enum Blocks : uint8_t
     NoteBlock = 25,
     BedBlock = 26,
 };
+
+struct BlockData {
+    uint8_t texTop;
+    uint8_t texBottom;
+    uint8_t texSide;
+    bool colorTop;
+    bool colorSide;
+    bool colorBottom;
+    float r, g, b;
+};
+
+extern BlockData BLOCK_DATABASE[256];
+
+void initBlockDatabase();

@@ -107,7 +107,7 @@ void PlayerMovement::update(Player &player, const World &world, float deltaTime)
     float drag = 10.0f;
     horizontalVel -= horizontalVel * drag * deltaTime;
 
-    std::cout << "player pos: " << player.position.x << ", " << player.position.y << ", " << player.position.z << std::endl;
+    // std::cout << "player pos: " << player.position.x << ", " << player.position.y << ", " << player.position.z << std::endl;
 
     if (glm::length(horizontalVel) < 0.1f)
         horizontalVel = glm::vec3(0.0f);

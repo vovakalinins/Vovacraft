@@ -41,6 +41,9 @@ set(SOURCES
     include/world/data/blocks.h
     include/world/physics/collisions.h
     src/world/physics/collisions.cpp
+    src/world/data/blocks.cpp
+    src/graphics/ui_renderer.cpp
+    include/graphics/ui_renderer.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

@@ -3,39 +3,28 @@
 #include "world/generation/chunkGenerator.h"
 #include <iostream>
 
-void WorldGenerator::generateFlatWorld(World &world, int sizeX, int sizeZ)
-{
-    for (int x = 0; x < sizeX; x++)
-    {
-        for (int z = 0; z < sizeZ; z++)
-        {
-            glm::ivec3 pos(x * CHUNK_SIZE, 0, z * CHUNK_SIZE);
-            auto newChunk = std::make_unique<Chunk>(pos);
-
-            ChunkGenerator::makeFlat(*newChunk);
-
-            world.addChunk(std::move(newChunk));
-
-            std::cout << "Generated Chunk at " << pos.x << ", " << pos.z << std::endl;
+void WorldGenerator::generateFlatWorld(World& world, int sizeX, int sizeZ) {
+    for (int x = 0; x < sizeX; x++) {
+        for (int z = 0; z < sizeZ; z++) {
+            glm::ivec2 pos(x * CHUNK_SIZE, z * CHUNK_SIZE);
+            auto chunk = std::make_unique<Chunk>(pos);
+            ChunkGenerator::makeFlat(*chunk);
+            world.addChunk(std::move(chunk));
         }
     }
 }
 
-void WorldGenerator::generateSeededWorld(World &world, int sizeX, int sizeZ, siv::PerlinNoise::seed_type seed)
-{
+void WorldGenerator::generateSeededWorld(World& world, int sizeX, int sizeZ, siv::PerlinNoise::seed_type seed) {
     const siv::PerlinNoise perlin{seed};
-    for (int x = 0; x < sizeX; x++)
-    {
-        for (int z = 0; z < sizeZ; z++)
-        {
-            glm::ivec3 pos(x * CHUNK_SIZE, 0, z * CHUNK_SIZE);
-            auto newChunk = std::make_unique<Chunk>(pos);
+    const siv::PerlinNoise continental{seed + 1};
 
-            ChunkGenerator::makeSeeded(*newChunk, perlin);
-
-            world.addChunk(std::move(newChunk));
-
-            std::cout << "Generated Chunk at " << pos.x << ", " << pos.z << std::endl;
+    for (int x = 0; x < sizeX; x++) {
+        for (int z = 0; z < sizeZ; z++) {
+            glm::ivec2 pos(x * CHUNK_SIZE, z * CHUNK_SIZE);
+            auto chunk = std::make_unique<Chunk>(pos);
+            ChunkGenerator::makeSeeded(*chunk, perlin, continental);
+            world.addChunk(std::move(chunk));
+            std::cout << "Generated chunk " << pos.x << ", " << pos.y << std::endl;
         }
     }
 }

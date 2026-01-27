@@ -3,14 +3,13 @@
 #include <memory>
 #include "world/chunk/chunk.h"
 
-class World
-{
+class World {
 public:
     std::vector<std::unique_ptr<Chunk>> chunks;
 
     World() = default;
 
     void addChunk(std::unique_ptr<Chunk> chunk);
-
-    const Chunk *getChunk(glm::ivec3 pos) const;
+    const Chunk* getChunkAt(int worldX, int worldZ) const;
+    uint8_t getBlock(int x, int y, int z) const;
 };

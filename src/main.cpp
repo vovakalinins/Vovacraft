@@ -16,6 +16,8 @@
 #include "world/generation/worldGenerator.h"
 #include "graphics/renderer.h"
 #include "world/player/playerMovement.h"
+#include "world/data/blocks.h"
+#include "graphics/ui_renderer.h"
 // Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 // float lastX = 800 / 2.0f;
 // float lastY = 600 / 2.0f;
@@ -25,6 +27,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
+    state.screenWidth = width;
+    state.screenHeight = height;
 }
 
 int main()
@@ -67,22 +71,28 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
-    unsigned int texture1 = loadTexture("./assets/grass.jpg", false), texture2 = loadTexture("./assets/face.png", true);
+    unsigned int texture1 = loadTexture("./assets/blockatlas.png", true);
 
     ourShader.use();
     ourShader.setInt("texture1", 0);
-    // ourShader.setInt("texture2", 1);
+
+    initBlockDatabase();
 
     // Chunk chunk(glm::vec3(0,0,0));
-    WorldGenerator::generateSeededWorld(state.world, 2, 2, 423456U);
+    WorldGenerator::generateSeededWorld(state.world, 4, 4, 42U);
     // WorldGenerator::generateFlatWorld(state.world, 2, 2);
 
     Renderer renderer;
+    UIRenderer uiRenderer;
+    uiRenderer.init();
+    unsigned int hotbarTexture = loadUITexture("./assets/Hotbar.png");
+    unsigned int selectionTexture = loadUITexture("./assets/Hotbar_selection.png");
 
     renderer.updateMeshes(state.world);
 
     // camera
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
@@ -110,11 +120,14 @@ int main()
 
         glm::mat4 projection;
         float aspect = (float)state.screenWidth / (float)state.screenHeight;
-        projection = glm::perspective(glm::radians(state.player.camera.Zoom), aspect, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(state.player.camera.Zoom), aspect, 0.1f, 500.0f);
 
         ourShader.setMat4("projection", projection);
 
         renderer.render(state.player.camera, ourShader);
+
+        uiRenderer.renderHotbar(hotbarTexture, selectionTexture, state.selectedSlot, 
+                                state.screenWidth, state.screenHeight);
 
         // glBindVertexArray(VAO);
 

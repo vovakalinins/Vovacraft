@@ -20,7 +20,10 @@ struct GameState {
   int screenWidth = 800;
   int screenHeight = 600;
 
-  GameState() : player(glm::vec3(8.0f, 10.0f, 8.0f)) {
+  // Hotbar
+  int selectedSlot = 0;
+
+  GameState() : player(glm::vec3(64.0f, 100.0f, 64.0f)) {
     // player.pitch = -45.0f;
     // player.syncCamera();
   }
