@@ -24,7 +24,7 @@ struct ChunkPosEqual {
 class Renderer {
 public:
     Renderer();
-    void updateMeshes(const World& world);
+    void updateMeshes(World& world);
     void render(const Camera& camera, Shader& shader);
 
 private:

@@ -18,115 +18,82 @@ glm::vec3 getBodyForward(const Player &player)
 
 glm::vec3 getBodyRight(const Player &player)
 {
-    glm::vec3 forward = getBodyForward(player);
-    return glm::normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
+    return glm::normalize(glm::cross(getBodyForward(player), glm::vec3(0, 1, 0)));
 }
 
 void PlayerMovement::moveForward(Player &player, float deltaTime)
 {
-    // add sprint
-    float currentSpeed = PlayerMovement::WALK_SPEED;
-
-    player.velocity += getBodyForward(player) * currentSpeed * deltaTime;
+    player.velocity += getBodyForward(player) * WALK_SPEED * deltaTime;
 }
 
 void PlayerMovement::moveBackward(Player &player, float deltaTime)
 {
-    player.velocity -= getBodyForward(player) * PlayerMovement::WALK_SPEED * deltaTime;
+    player.velocity -= getBodyForward(player) * WALK_SPEED * deltaTime;
 }
 
 void PlayerMovement::moveLeft(Player &player, float deltaTime)
 {
-    player.velocity -= getBodyRight(player) * PlayerMovement::WALK_SPEED * deltaTime;
+    player.velocity -= getBodyRight(player) * WALK_SPEED * deltaTime;
 }
 
 void PlayerMovement::moveRight(Player &player, float deltaTime)
 {
-    player.velocity += getBodyRight(player) * PlayerMovement::WALK_SPEED * deltaTime;
+    player.velocity += getBodyRight(player) * WALK_SPEED * deltaTime;
 }
 
 void PlayerMovement::flyUp(Player &player, float deltaTime)
 {
-    player.velocity.y += PlayerMovement::FLY_SPEED * deltaTime;
+    player.velocity.y += FLY_SPEED * deltaTime;
 }
 
 void PlayerMovement::jump(Player &player, const World &world)
 {
-    if (isOnGround(player, world) && std::abs(player.velocity.y) < 0.01f)
+    if (isOnGround(player, world) && player.velocity.y <= 0)
     {
         player.velocity.y = JUMP_FORCE;
     }
 }
 
-void PlayerMovement::sneak(Player &player, const World &world)
-{
-    if (isOnGround(player, world))
-    {
-        player.velocity.y = JUMP_FORCE;
-    }
-}
+void PlayerMovement::sneak(Player &player, const World &world) {}
 
 void PlayerMovement::flyDown(Player &player, float deltaTime)
 {
-    player.velocity.y -= PlayerMovement::FLY_SPEED * deltaTime;
+    player.velocity.y -= FLY_SPEED * deltaTime;
 }
 
 void PlayerMovement::look(Player &player, float xOffset, float yOffset)
 {
     player.yaw += xOffset * MOUSE_SENSITIVITY;
-
     player.pitch += yOffset * MOUSE_SENSITIVITY;
-
     if (player.pitch > 89.0f)
         player.pitch = 89.0f;
     if (player.pitch < -89.0f)
         player.pitch = -89.0f;
 }
 
-void PlayerMovement::applyGravity(Player &player, const World &world, float deltaTime)
-{
-    if (!isOnGround(player, world))
-    {
-        player.velocity.y -= 32.0f * deltaTime;
-    }
-    else
-    {
-        if (player.velocity.y < 0)
-        {
-            player.velocity.y = 0;
-            player.position.y = std::round(player.position.y);
-        }
-    }
-}
-
 void PlayerMovement::update(Player &player, const World &world, float deltaTime)
 {
-    glm::vec3 horizontalVel = glm::vec3(player.velocity.x, 0.0f, player.velocity.z);
-    float verticalVel = player.velocity.y;
+    glm::vec3 hVel(player.velocity.x, 0, player.velocity.z);
+    hVel *= (1.0f - 10.0f * deltaTime);
+    if (glm::length(hVel) < 0.01f)
+        hVel = glm::vec3(0);
 
-    float drag = 10.0f;
-    horizontalVel -= horizontalVel * drag * deltaTime;
-
-    // std::cout << "player pos: " << player.position.x << ", " << player.position.y << ", " << player.position.z << std::endl;
-
-    if (glm::length(horizontalVel) < 0.1f)
-        horizontalVel = glm::vec3(0.0f);
+    float vVel = player.velocity.y;
 
     if (player.gameMode == 0)
     {
-        applyGravity(player, world, deltaTime);
-
-        verticalVel = player.velocity.y;
+        vVel -= 28.0f * deltaTime;
+        if (vVel < -50.0f)
+            vVel = -50.0f;
     }
-    else if (player.gameMode == 1)
+    else
     {
-        verticalVel -= verticalVel * deltaTime;
-
-        if (std::abs(verticalVel) < 0.1f)
-            verticalVel = 0.0f;
+        vVel *= (1.0f - 5.0f * deltaTime);
+        if (std::abs(vVel) < 0.1f)
+            vVel = 0;
     }
 
-    player.velocity = glm::vec3(horizontalVel.x, verticalVel, horizontalVel.z);
+    player.velocity = glm::vec3(hVel.x, vVel, hVel.z);
 
     float moveX = player.velocity.x * deltaTime;
     if (checkCollision(player, world, glm::vec3(moveX, 0, 0)))
@@ -145,20 +112,27 @@ void PlayerMovement::update(Player &player, const World &world, float deltaTime)
     player.position.z += moveZ;
 
     float moveY = player.velocity.y * deltaTime;
+    glm::vec3 newPos = player.position + glm::vec3(0, moveY, 0);
+
     if (checkCollision(player, world, glm::vec3(0, moveY, 0)))
     {
         if (player.velocity.y < 0)
         {
+            float groundY = getGroundY(player, world);
+            player.position.y = groundY;
             player.velocity.y = 0;
-            player.position.y = std::round(player.position.y);
         }
         else
         {
             player.velocity.y = 0;
         }
-        moveY = 0;
     }
-    player.position.y += moveY;
+    else
+    {
+        player.position.y += moveY;
+    }
+
+    std::cout << "player pos " << player.position.x << ", " << player.position.y << ", " << player.position.z << std::endl;
 
     player.syncCamera();
 }

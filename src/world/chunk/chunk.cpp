@@ -5,6 +5,7 @@ Chunk::Chunk(glm::ivec2 pos) : position(pos), blocks(CHUNK_SIZE * CHUNK_SIZE * C
 void Chunk::setBlock(int x, int y, int z, uint8_t type) {
     if (x >= 0 && x < CHUNK_SIZE && y >= 0 && y < CHUNK_HEIGHT && z >= 0 && z < CHUNK_SIZE) {
         blocks[index(x, y, z)] = type;
+        meshDirty = true;
     }
 }
 

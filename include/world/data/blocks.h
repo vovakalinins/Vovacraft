@@ -10,10 +10,12 @@ enum TextureId : uint8_t {
     TEX_BEDROCK = 17,
     TEX_WATER_STATIONARY = 223,
     TEX_SAND = 18,
+    TEX_LOG = 20,
+    TEX_LOG_TOP = 21,
+    TEX_LEAVES = 52,
 };
 
-enum Blocks : uint8_t
-{
+enum Blocks : uint8_t {
     Air = 0,
     Stone = 1,
     Grass = 2,
@@ -51,8 +53,12 @@ struct BlockData {
     bool colorSide;
     bool colorBottom;
     float r, g, b;
+    float alpha;
+    bool transparent;
 };
 
 extern BlockData BLOCK_DATABASE[256];
 
 void initBlockDatabase();
+inline bool isTransparent(uint8_t block) { return BLOCK_DATABASE[block].transparent; }
+inline bool isWater(uint8_t block) { return block == WaterStationary || block == WaterFlowing; }

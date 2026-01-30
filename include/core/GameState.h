@@ -23,7 +23,7 @@ struct GameState {
   // Hotbar
   int selectedSlot = 0;
 
-  GameState() : player(glm::vec3(64.0f, 100.0f, 64.0f)) {
+  GameState() : player(glm::vec3(0.0f, 120.0f, 0.0f)) {
     // player.pitch = -45.0f;
     // player.syncCamera();
   }

@@ -4,15 +4,15 @@
 
 Renderer::Renderer() {}
 
-void Renderer::updateMeshes(const World& world) {
-    for (const auto& chunk : world.chunks) {
+void Renderer::updateMeshes(World& world) {
+    for (auto& chunk : world.chunks) {
         glm::ivec2 pos = chunk->position;
-        if (meshCache.find(pos) == meshCache.end()) {
+        if (chunk->meshDirty || meshCache.find(pos) == meshCache.end()) {
             std::vector<float> vertices = ChunkMesher::generateMesh(*chunk);
             auto mesh = std::make_unique<ChunkMesh>();
             mesh->upload(vertices);
             meshCache[pos] = std::move(mesh);
-            std::cout << "Meshed chunk " << pos.x << ", " << pos.y << std::endl;
+            chunk->meshDirty = false;
         }
     }
 }

@@ -44,6 +44,13 @@ set(SOURCES
     src/world/data/blocks.cpp
     src/graphics/ui_renderer.cpp
     include/graphics/ui_renderer.h
+    include/world/data/structures.h
+    include/world/data/structures/tree.h
+    src/world/player/playerActions.cpp
+    include/world/player/playerActions.h
+    src/world/physics/raycast.cpp
+    include/world/physics/raycast.h
+    include/world/player/inventory.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

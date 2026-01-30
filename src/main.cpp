@@ -54,6 +54,7 @@ int main()
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -79,7 +80,7 @@ int main()
     initBlockDatabase();
 
     // Chunk chunk(glm::vec3(0,0,0));
-    WorldGenerator::generateSeededWorld(state.world, 4, 4, 42U);
+    WorldGenerator::generateSeededWorld(state.world, 4, 4, 48U);
     // WorldGenerator::generateFlatWorld(state.world, 2, 2);
 
     Renderer renderer;
@@ -104,6 +105,8 @@ int main()
         PlayerMovement::update(state.player, state.world, state.deltaTime);
         // PlayerMovement::applyGravity(state.player, world, state.deltaTime);
 
+        renderer.updateMeshes(state.world);
+
         glClearColor(73.0f / 255.0f, 129.0f / 255.0f, 235.0f / 255.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -124,9 +127,14 @@ int main()
 
         ourShader.setMat4("projection", projection);
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         renderer.render(state.player.camera, ourShader);
 
-        uiRenderer.renderHotbar(hotbarTexture, selectionTexture, state.selectedSlot, 
+        glDisable(GL_BLEND);
+
+        uiRenderer.renderHotbar(hotbarTexture, selectionTexture, state.selectedSlot,
                                 state.screenWidth, state.screenHeight);
 
         // glBindVertexArray(VAO);

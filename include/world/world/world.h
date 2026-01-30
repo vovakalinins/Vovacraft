@@ -11,5 +11,7 @@ public:
 
     void addChunk(std::unique_ptr<Chunk> chunk);
     const Chunk* getChunkAt(int worldX, int worldZ) const;
+    Chunk* getChunkAt(int worldX, int worldZ);
     uint8_t getBlock(int x, int y, int z) const;
+    void setBlock(int x, int y, int z, uint8_t type);
 };

@@ -12,6 +12,7 @@ class Chunk {
 public:
     std::vector<uint8_t> blocks;
     glm::ivec2 position;
+    bool meshDirty = false;
 
     Chunk(glm::ivec2 pos);
 

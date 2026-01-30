@@ -1,16 +1,38 @@
 #include "world/physics/collisions.h"
 #include <cmath>
 
+bool wouldBlockCollideWithPlayer(const Player& player, glm::ivec3 blockPos) {
+    float hw = player.width / 2.0f;
+    float pMinX = player.position.x - hw, pMaxX = player.position.x + hw;
+    float pMinY = player.position.y, pMaxY = player.position.y + player.height;
+    float pMinZ = player.position.z - hw, pMaxZ = player.position.z + hw;
+
+    float bMinX = (float)blockPos.x, bMaxX = (float)(blockPos.x + 1);
+    float bMinY = (float)blockPos.y, bMaxY = (float)(blockPos.y + 1);
+    float bMinZ = (float)blockPos.z, bMaxZ = (float)(blockPos.z + 1);
+
+    return pMaxX > bMinX && pMinX < bMaxX &&
+           pMaxY > bMinY && pMinY < bMaxY &&
+           pMaxZ > bMinZ && pMinZ < bMaxZ;
+}
+
 bool checkCollision(const Player& player, const World& world, glm::vec3 offset) {
     glm::vec3 target = player.position + offset;
     float hw = player.width / 2.0f;
 
-    int minX = (int)std::floor(target.x - hw);
-    int maxX = (int)std::floor(target.x + hw);
-    int minY = (int)std::floor(target.y);
-    int maxY = (int)std::floor(target.y + player.height);
-    int minZ = (int)std::floor(target.z - hw);
-    int maxZ = (int)std::floor(target.z + hw);
+    float pMinX = target.x - hw;
+    float pMaxX = target.x + hw;
+    float pMinY = target.y;
+    float pMaxY = target.y + player.height;
+    float pMinZ = target.z - hw;
+    float pMaxZ = target.z + hw;
+
+    int minX = (int)std::floor(pMinX);
+    int maxX = (int)std::floor(pMaxX);
+    int minY = (int)std::floor(pMinY);
+    int maxY = (int)std::floor(pMaxY);
+    int minZ = (int)std::floor(pMinZ);
+    int maxZ = (int)std::floor(pMaxZ);
 
     for (int bx = minX; bx <= maxX; bx++) {
         for (int by = minY; by <= maxY; by++) {
@@ -18,13 +40,13 @@ bool checkCollision(const Player& player, const World& world, glm::vec3 offset) 
                 if (by < Y_MIN || by > Y_MAX) continue;
                 uint8_t block = world.getBlock(bx, by, bz);
                 if (block != 0 && block != Blocks::WaterStationary && block != Blocks::WaterFlowing) {
-                    float bMinX = bx - 0.5f, bMaxX = bx + 0.5f;
+                    float bMinX = (float)bx, bMaxX = (float)(bx + 1);
                     float bMinY = (float)by, bMaxY = (float)(by + 1);
-                    float bMinZ = bz - 0.5f, bMaxZ = bz + 0.5f;
+                    float bMinZ = (float)bz, bMaxZ = (float)(bz + 1);
 
-                    if (target.x + hw > bMinX && target.x - hw < bMaxX &&
-                        target.y + player.height > bMinY && target.y < bMaxY &&
-                        target.z + hw > bMinZ && target.z - hw < bMaxZ) {
+                    if (pMaxX > bMinX && pMinX < bMaxX &&
+                        pMaxY > bMinY && pMinY < bMaxY &&
+                        pMaxZ > bMinZ && pMinZ < bMaxZ) {
                         return true;
                     }
                 }
@@ -34,30 +56,29 @@ bool checkCollision(const Player& player, const World& world, glm::vec3 offset) 
     return false;
 }
 
-bool isOnGround(Player& player, const World& world) {
-    float checkY = player.position.y - 0.01f;
+float getGroundY(const Player& player, const World& world) {
     float hw = player.width / 2.0f;
-
     int minX = (int)std::floor(player.position.x - hw);
     int maxX = (int)std::floor(player.position.x + hw);
-    int by = (int)std::floor(checkY);
     int minZ = (int)std::floor(player.position.z - hw);
     int maxZ = (int)std::floor(player.position.z + hw);
 
-    for (int bx = minX; bx <= maxX; bx++) {
-        for (int bz = minZ; bz <= maxZ; bz++) {
-            if (by < Y_MIN || by > Y_MAX) continue;
-            uint8_t block = world.getBlock(bx, by, bz);
-            if (block != 0 && block != Blocks::WaterStationary && block != Blocks::WaterFlowing) {
-                float bMinX = bx - 0.5f, bMaxX = bx + 0.5f;
-                float bMinZ = bz - 0.5f, bMaxZ = bz + 0.5f;
-
-                if (player.position.x + hw > bMinX && player.position.x - hw < bMaxX &&
-                    player.position.z + hw > bMinZ && player.position.z - hw < bMaxZ) {
-                    return true;
+    int startY = (int)std::floor(player.position.y) - 1;
+    
+    for (int by = startY; by >= Y_MIN && by > startY - 10; by--) {
+        for (int bx = minX; bx <= maxX; bx++) {
+            for (int bz = minZ; bz <= maxZ; bz++) {
+                uint8_t block = world.getBlock(bx, by, bz);
+                if (block != 0 && block != Blocks::WaterStationary && block != Blocks::WaterFlowing) {
+                    return (float)(by + 1);
                 }
             }
         }
     }
-    return false;
+    return (float)(Y_MIN - 100);
+}
+
+bool isOnGround(Player& player, const World& world) {
+    float groundY = getGroundY(player, world);
+    return std::abs(player.position.y - groundY) < 0.01f;
 }

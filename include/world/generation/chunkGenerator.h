@@ -5,7 +5,5 @@
 namespace ChunkGenerator
 {
     void makeFlat(Chunk &chunk);
-    void makeSeeded(Chunk &chunk, siv::PerlinNoise perlin, siv::PerlinNoise continental);
-
-    // void makeNoise(Chunk& chunk, int seed);
+    void makeSeeded(Chunk &chunk, siv::PerlinNoise perlin, siv::PerlinNoise continental, siv::PerlinNoise::seed_type seed);
 }

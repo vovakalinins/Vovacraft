@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "graphics/camera.h"
+#include "world/player/inventory.h"
 
 class Player
 {
@@ -12,13 +13,13 @@ public:
     float pitch;
 
     Camera camera;
-    float eyeHeight = 1.3f;
+    float eyeHeight = 1.8f;
 
     float height = 1.8f;
     float width = 0.6f;
     float weight = 100.0f;
 
-    int gameMode = 1; // 0s 1c
+    int gameMode = 0; // 0s 1c
     int health = 20;
 
     bool isFlying = false;
@@ -26,6 +27,8 @@ public:
     bool isRunning = false;
 
     Player(glm::vec3 startPos);
+
+    Inventory inventory;
 
     void syncCamera();
     glm::mat4 getViewMatrix();

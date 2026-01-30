@@ -5,3 +5,4 @@
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
