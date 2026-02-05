@@ -6,7 +6,7 @@ std::optional<RaycastResult> getRaycastedBlock(const Player &player, World &worl
     glm::vec3 rayOrigin = player.camera.Position;
     glm::vec3 rayDir = player.camera.Front;
 
-    float maxReach = 5.0f;
+    float maxReach = 4.5f;
     float stepSize = 0.05f;
 
     glm::ivec3 prevPos = glm::ivec3(std::floor(rayOrigin.x),
@@ -31,6 +31,13 @@ std::optional<RaycastResult> getRaycastedBlock(const Player &player, World &worl
                 result.didHit = true;
                 result.hitPos = currPos;
                 result.placePos = prevPos;
+                glm::ivec3 d = prevPos - currPos;
+                if (d.z == -1) result.hitFace = 0;
+                else if (d.z == 1) result.hitFace = 1;
+                else if (d.x == -1) result.hitFace = 2;
+                else if (d.x == 1) result.hitFace = 3;
+                else if (d.y == -1) result.hitFace = 4;
+                else if (d.y == 1) result.hitFace = 5;
                 return result;
             }
         }

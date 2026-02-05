@@ -24,9 +24,13 @@ struct ChunkPosEqual {
 class Renderer {
 public:
     Renderer();
+    ~Renderer();
     void updateMeshes(World& world);
-    void render(const Camera& camera, Shader& shader);
+    void render(const Camera& camera, Shader& shader,
+        const glm::ivec3& breakTarget, int breakFace, float breakProgress, bool breakValid);
 
 private:
     std::unordered_map<glm::ivec2, std::unique_ptr<ChunkMesh>, ChunkPosHash, ChunkPosEqual> meshCache;
+    unsigned int breakOverlayVAO = 0;
+    unsigned int breakOverlayVBO = 0;
 };

@@ -21,12 +21,33 @@ static const float faces[6][30] = {
     {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
      1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}};
 
-inline bool shouldRenderFace(const Chunk& chunk, uint8_t thisBlock, int nx, int ny, int nz) {
-    if (nx < 0 || nx >= CHUNK_SIZE || ny < 0 || ny >= CHUNK_HEIGHT || nz < 0 || nz >= CHUNK_SIZE)
+inline bool shouldRenderFace(const World &world, const Chunk &chunk,
+                             int x, int y, int z,
+                             int nx, int ny, int nz,
+                             uint8_t thisBlock)
+{
+    if (ny < 0 || ny >= CHUNK_HEIGHT)
         return true;
-    uint8_t neighbor = chunk.getBlock(nx, ny, nz);
-    if (neighbor == 0) return true;
-    if (isWater(thisBlock)) return neighbor == 0;
+
+    if (nx >= 0 && nx < CHUNK_SIZE && nz >= 0 && nz < CHUNK_SIZE)
+    {
+        uint8_t neighbor = chunk.getBlock(nx, ny, nz);
+        if (neighbor == 0)
+            return true;
+        if (isWater(thisBlock))
+            return neighbor == 0;
+        return isTransparent(neighbor);
+    }
+
+    int worldX = chunk.position.x + nx;
+    int worldZ = chunk.position.y + nz;
+    int worldY = y + Y_MIN;
+
+    uint8_t neighbor = world.getBlock(worldX, worldY, worldZ);
+    if (neighbor == 0)
+        return true;
+    if (isWater(thisBlock))
+        return neighbor == 0;
     return isTransparent(neighbor);
 }
 
@@ -66,7 +87,7 @@ inline void getVisuals(uint8_t block, int face, int& tex, float& r, float& g, fl
     }
 }
 
-std::vector<float> ChunkMesher::generateMesh(const Chunk& chunk) {
+std::vector<float> ChunkMesher::generateMesh(const World &world, const Chunk& chunk) {
     std::vector<float> verts;
     verts.reserve(100000);
 
@@ -80,27 +101,27 @@ std::vector<float> ChunkMesher::generateMesh(const Chunk& chunk) {
                 int tex;
                 float r, g, b, a;
 
-                if (shouldRenderFace(chunk, block, x + 1, y, z)) {
+                if (shouldRenderFace(world, chunk, x, y, z, x + 1, y, z, block)) {
                     getVisuals(block, 3, tex, r, g, b, a);
                     addFace(verts, x, worldY, z, 3, tex, r, g, b, a);
                 }
-                if (shouldRenderFace(chunk, block, x - 1, y, z)) {
+                if (shouldRenderFace(world, chunk, x, y, z, x - 1, y, z, block)) {
                     getVisuals(block, 2, tex, r, g, b, a);
                     addFace(verts, x, worldY, z, 2, tex, r, g, b, a);
                 }
-                if (shouldRenderFace(chunk, block, x, y + 1, z)) {
+                if (shouldRenderFace(world, chunk, x, y, z, x, y + 1, z, block)) {
                     getVisuals(block, 4, tex, r, g, b, a);
                     addFace(verts, x, worldY, z, 4, tex, r, g, b, a);
                 }
-                if (shouldRenderFace(chunk, block, x, y - 1, z)) {
+                if (shouldRenderFace(world, chunk, x, y, z, x, y - 1, z, block)) {
                     getVisuals(block, 5, tex, r, g, b, a);
                     addFace(verts, x, worldY, z, 5, tex, r, g, b, a);
                 }
-                if (shouldRenderFace(chunk, block, x, y, z + 1)) {
+                if (shouldRenderFace(world, chunk, x, y, z, x, y, z + 1, block)) {
                     getVisuals(block, 0, tex, r, g, b, a);
                     addFace(verts, x, worldY, z, 0, tex, r, g, b, a);
                 }
-                if (shouldRenderFace(chunk, block, x, y, z - 1)) {
+                if (shouldRenderFace(world, chunk, x, y, z, x, y, z - 1, block)) {
                     getVisuals(block, 1, tex, r, g, b, a);
                     addFace(verts, x, worldY, z, 1, tex, r, g, b, a);
                 }

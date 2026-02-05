@@ -55,6 +55,7 @@ struct BlockData {
     float r, g, b;
     float alpha;
     bool transparent;
+    float breakTime;
 };
 
 extern BlockData BLOCK_DATABASE[256];
@@ -62,3 +63,4 @@ extern BlockData BLOCK_DATABASE[256];
 void initBlockDatabase();
 inline bool isTransparent(uint8_t block) { return BLOCK_DATABASE[block].transparent; }
 inline bool isWater(uint8_t block) { return block == WaterStationary || block == WaterFlowing; }
+inline float getBreakTime(uint8_t block) { return BLOCK_DATABASE[block].breakTime; }

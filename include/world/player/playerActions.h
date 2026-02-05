@@ -5,6 +5,5 @@
 namespace PlayerActions {
     void breakBlock(const Player &player, World& world);
     void placeBlock(const Player &player, World& world);
-    // void attack();
-    // void takeAim();
+    void updateBreaking(Player& player, World& world, float deltaTime, bool leftMouseHeld);
 }

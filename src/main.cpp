@@ -97,6 +97,7 @@ int main()
     uiRenderer.init();
     unsigned int hotbarTexture = loadUITexture("./assets/Hotbar.png");
     unsigned int selectionTexture = loadUITexture("./assets/Hotbar_selection.png");
+    unsigned int crosshairTexture = loadUITexture("./assets/Crosshair.png");
 
     renderer.updateMeshes(state.world);
 
@@ -139,12 +140,14 @@ int main()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        renderer.render(state.player.camera, ourShader);
+        renderer.render(state.player.camera, ourShader,
+            state.breakTarget, state.breakFace, state.breakProgress, state.breakValid);
 
         glDisable(GL_BLEND);
 
         uiRenderer.renderHotbar(hotbarTexture, selectionTexture, state.selectedSlot,
                                 state.screenWidth, state.screenHeight);
+        uiRenderer.renderCrosshair(crosshairTexture, state.screenWidth, state.screenHeight);
 
         // glBindVertexArray(VAO);
 

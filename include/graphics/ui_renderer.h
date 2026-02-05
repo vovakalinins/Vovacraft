@@ -12,6 +12,7 @@ public:
     void init();
     void renderHotbar(unsigned int hotbarTexture, unsigned int selectionTexture,
                       int selectedSlot, int screenWidth, int screenHeight);
+    void renderCrosshair(unsigned int crosshairTexture, int screenWidth, int screenHeight);
 
 private:
     unsigned int VAO, VBO;

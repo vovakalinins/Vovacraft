@@ -6,6 +6,7 @@
 struct RaycastResult {
     glm::ivec3 hitPos;
     glm::ivec3 placePos;
+    int hitFace = 0;
     bool didHit = false;
 };
 

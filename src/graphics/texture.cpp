@@ -39,24 +39,24 @@ unsigned int loadUITexture(const char *path)
     unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    
+
     int imgwidth, imgheight, nrChannels;
     stbi_set_flip_vertically_on_load(false);
-    
+
     unsigned char *data = stbi_load(path, &imgwidth, &imgheight, &nrChannels, 4);
-    
+
     if (data)
     {
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgwidth, imgheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-        
+
         std::cout << "Loaded UI texture: " << path << " (" << imgwidth << "x" << imgheight << ")" << std::endl;
     }
     else
@@ -64,8 +64,8 @@ unsigned int loadUITexture(const char *path)
         std::cout << "Failed to load UI texture: " << path << std::endl;
     }
     stbi_image_free(data);
-    
+
     stbi_set_flip_vertically_on_load(true);
-    
+
     return texture;
 }

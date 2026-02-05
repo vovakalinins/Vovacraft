@@ -18,4 +18,6 @@ public:
     uint8_t getBlock(int x, int y, int z) const;
     void setBlock(int x, int y, int z, uint8_t type);
     void computeSpawn();
+    static bool isSolidBlock(uint8_t block);
+    static int getSurfaceY(const World &world, int worldX, int worldZ);
 };

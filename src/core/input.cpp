@@ -26,10 +26,6 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-    {
-        PlayerActions::breakBlock(state.player, state.world);
-    }
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
     {
         PlayerActions::placeBlock(state.player, state.world);
@@ -48,6 +44,9 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 
 void processInput(GLFWwindow *window)
 {
+    PlayerActions::updateBreaking(state.player, state.world, state.deltaTime,
+        glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 

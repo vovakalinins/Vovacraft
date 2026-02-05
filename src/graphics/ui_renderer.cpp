@@ -95,3 +95,28 @@ void UIRenderer::renderHotbar(unsigned int hotbarTexture, unsigned int selection
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 }
+
+void UIRenderer::renderCrosshair(unsigned int crosshairTexture, int screenWidth, int screenHeight)
+{
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+
+    uiShader->use();
+    glm::mat4 projection = glm::ortho(0.0f, (float)screenWidth, 0.0f, (float)screenHeight);
+    uiShader->setMat4("projection", projection);
+
+    glBindVertexArray(VAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, crosshairTexture);
+    uiShader->setInt("uiTexture", 0);
+
+    float size = 48.0f;
+    float x = (screenWidth - size) / 2.0f;
+    float y = (screenHeight - size) / 2.0f;
+    renderQuad(x, y, size, size);
+
+    glBindVertexArray(0);
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+}
