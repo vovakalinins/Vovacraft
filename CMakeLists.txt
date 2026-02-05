@@ -51,6 +51,8 @@ set(SOURCES
     src/world/physics/raycast.cpp
     include/world/physics/raycast.h
     include/world/player/inventory.h
+    src/world/generation/populators/foliageGenerator.cpp
+    include/world/generation/populators/foliageGenerator.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

@@ -1,10 +1,9 @@
 #include "world/generation/chunkGenerator.h"
 #include "world/chunk/chunk.h"
 #include "world/data/blocks.h"
+#include "world/world/world.h"
 #include <cmath>
-#include "world/data/structures.h"
-#include "world/data/structures/tree.h"
-#include <random>
+
 
 void ChunkGenerator::makeFlat(Chunk &chunk)
 {
@@ -28,13 +27,8 @@ void ChunkGenerator::makeFlat(Chunk &chunk)
     }
 }
 
-void ChunkGenerator::makeSeeded(Chunk &chunk, siv::PerlinNoise perlin, siv::PerlinNoise continental, siv::PerlinNoise::seed_type seed)
+void ChunkGenerator::makeSeeded(World &world, Chunk &chunk, siv::PerlinNoise perlin, siv::PerlinNoise continental)
 {
-    int surfaceY[CHUNK_SIZE][CHUNK_SIZE];
-    for (int x = 0; x < CHUNK_SIZE; x++)
-        for (int z = 0; z < CHUNK_SIZE; z++)
-            surfaceY[x][z] = -1;
-
     for (int x = 0; x < CHUNK_SIZE; x++)
     {
         for (int z = 0; z < CHUNK_SIZE; z++)
@@ -100,33 +94,12 @@ void ChunkGenerator::makeSeeded(Chunk &chunk, siv::PerlinNoise perlin, siv::Perl
                         chunk.setBlock(x, y, z, Blocks::Sand);
                     else
                         chunk.setBlock(x, y, z, Blocks::Grass);
-                    surfaceY[x][z] = y;
                 }
                 else if (worldY <= SEA_LEVEL)
                 {
                     chunk.setBlock(x, y, z, Blocks::WaterStationary);
                 }
             }
-        }
-    }
-
-    for (int x = 0; x < CHUNK_SIZE; x++)
-    {
-        for (int z = 0; z < CHUNK_SIZE; z++)
-        {
-            int localY = surfaceY[x][z];
-            if (localY < 0)
-                continue;
-            if (chunk.getBlock(x, localY, z) != Blocks::Grass)
-                continue;
-            int worldX = chunk.position.x + x;
-            int worldZ = chunk.position.y + z;
-            std::mt19937 gen(static_cast<std::mt19937::result_type>(seed ^ (static_cast<uint64_t>(worldX) * 73856093u) ^ (static_cast<uint64_t>(worldZ) * 19349663u)));
-            std::uniform_real_distribution<double> dist(0.0, 1.0);
-            if (dist(gen) >= 0.025)
-                continue;
-            std::unique_ptr<Structure> sPtr = std::make_unique<Tree>();
-            sPtr->generate(chunk, x, localY, z);
         }
     }
 }

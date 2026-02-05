@@ -26,7 +26,7 @@ public:
     bool isSneaking = false;
     bool isRunning = false;
 
-    Player(glm::vec3 startPos);
+    Player();
 
     Inventory inventory;
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "world/data/blocks.h"
-#include "world/chunk/chunk.h"
+
+class Chunk;
+class World;
 
 struct structureBlock
 {
@@ -12,5 +14,5 @@ class Structure
 {
 public:
     virtual ~Structure() = default;
-    virtual void generate(Chunk &chunk, int x, int y, int z) = 0;
+    virtual void generate(World& world, int worldX, int worldY, int worldZ) = 0;
 };

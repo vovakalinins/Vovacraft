@@ -71,6 +71,7 @@ int main()
     // unsigned int EBO = initEBO();
 
     glEnable(GL_DEPTH_TEST);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     unsigned int texture1 = loadTexture("./assets/blockatlas.png", true);
 
@@ -80,8 +81,16 @@ int main()
     initBlockDatabase();
 
     // Chunk chunk(glm::vec3(0,0,0));
-    WorldGenerator::generateSeededWorld(state.world, 4, 4, 48U);
-    // WorldGenerator::generateFlatWorld(state.world, 2, 2);
+    srand(static_cast<unsigned int>(time(0)));
+    uint_fast32_t ranSeed = static_cast<uint_fast32_t>(rand() % 101);
+
+    WorldGenerator::generateSeededWorld(state.world, 4, 4, ranSeed);
+    state.world.computeSpawn();
+    state.player.position = glm::vec3(
+        state.world.worldSpawn.x,
+        state.world.worldSpawn.y+1,
+        state.world.worldSpawn.z);
+    state.player.syncCamera();
 
     Renderer renderer;
     UIRenderer uiRenderer;

@@ -1,7 +1,7 @@
 #include "world/player/player.h"
 
-Player::Player(glm::vec3 startPos) 
-    : position(startPos), velocity(0.0f), yaw(-90.0f), pitch(0.0f) 
+Player::Player() 
+    : velocity(0.0f), yaw(-90.0f), pitch(0.0f) 
 {
     syncCamera();
 }
