@@ -5,9 +5,12 @@
 #include <iostream>
 #include <chrono>
 
-void WorldGenerator::generateFlatWorld(World& world, int sizeX, int sizeZ) {
-    for (int x = 0; x < sizeX; x++) {
-        for (int z = 0; z < sizeZ; z++) {
+void WorldGenerator::generateFlatWorld(World &world, int sizeX, int sizeZ)
+{
+    for (int x = 0; x < sizeX; x++)
+    {
+        for (int z = 0; z < sizeZ; z++)
+        {
             glm::ivec2 pos(x * CHUNK_SIZE, z * CHUNK_SIZE);
             auto chunk = std::make_unique<Chunk>(pos);
             ChunkGenerator::makeFlat(*chunk);
@@ -16,13 +19,16 @@ void WorldGenerator::generateFlatWorld(World& world, int sizeX, int sizeZ) {
     }
 }
 
-void WorldGenerator::generateSeededWorld(World& world, int sizeX, int sizeZ, siv::PerlinNoise::seed_type seed) {
+void WorldGenerator::generateSeededWorld(World &world, int sizeX, int sizeZ, siv::PerlinNoise::seed_type seed)
+{
     const siv::PerlinNoise perlin{seed};
     const siv::PerlinNoise continental{seed + 1};
     const siv::PerlinNoise foliageNoise{seed + 2};
 
-    for (int x = 0; x < sizeX; x++) {
-        for (int z = 0; z < sizeZ; z++) {
+    for (int x = 0; x < sizeX; x++)
+    {
+        for (int z = 0; z < sizeZ; z++)
+        {
             auto start = std::chrono::high_resolution_clock::now();
 
             glm::ivec2 pos(x * CHUNK_SIZE, z * CHUNK_SIZE);
@@ -33,9 +39,9 @@ void WorldGenerator::generateSeededWorld(World& world, int sizeX, int sizeZ, siv
 
             auto end = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-            std::cout << "Generated chunk " << pos.x << ", " << pos.y << " in " << elapsed.count() << "ms"<< std::endl;
+            std::cout << "Generated chunk " << pos.x << ", " << pos.y << " in " << elapsed.count() << "ms" << std::endl;
         }
     }
-    for (auto& c : world.chunks)
+    for (auto &c : world.chunks)
         generateFoliage(world, *c, foliageNoise);
 }

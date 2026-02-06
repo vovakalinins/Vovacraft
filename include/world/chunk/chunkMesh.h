@@ -5,13 +5,17 @@
 class ChunkMesh
 {
 public:
-    unsigned int VAO, VBO;
-    unsigned int vertexCount;
+    unsigned int opaqueVAO, opaqueVBO;
+    unsigned int opaqueVertexCount;
+
+    unsigned int transparentVAO, transparentVBO;
+    unsigned int transparentVertexCount;
 
     ChunkMesh();
     ~ChunkMesh();
 
-    void upload(const std::vector<float> &vertices);
+    void upload(const std::vector<float> &opaqueVerts, const std::vector<float> &transparentVerts);
 
-    void render(unsigned int shaderID, glm::vec3 position);
+    void renderOpaque(unsigned int shaderID, glm::vec3 position);
+    void renderTransparent(unsigned int shaderID, glm::vec3 position);
 };

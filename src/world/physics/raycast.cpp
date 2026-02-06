@@ -32,12 +32,18 @@ std::optional<RaycastResult> getRaycastedBlock(const Player &player, World &worl
                 result.hitPos = currPos;
                 result.placePos = prevPos;
                 glm::ivec3 d = prevPos - currPos;
-                if (d.z == -1) result.hitFace = 0;
-                else if (d.z == 1) result.hitFace = 1;
-                else if (d.x == -1) result.hitFace = 2;
-                else if (d.x == 1) result.hitFace = 3;
-                else if (d.y == -1) result.hitFace = 4;
-                else if (d.y == 1) result.hitFace = 5;
+                if (d.z == -1)
+                    result.hitFace = 0;
+                else if (d.z == 1)
+                    result.hitFace = 1;
+                else if (d.x == -1)
+                    result.hitFace = 2;
+                else if (d.x == 1)
+                    result.hitFace = 3;
+                else if (d.y == -1)
+                    result.hitFace = 4;
+                else if (d.y == 1)
+                    result.hitFace = 5;
                 return result;
             }
         }

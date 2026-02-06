@@ -132,7 +132,7 @@ void PlayerMovement::update(Player &player, const World &world, float deltaTime)
         player.position.y += moveY;
     }
 
-    std::cout << "player pos " << player.position.x << ", " << player.position.y << ", " << player.position.z << std::endl;
+    // std::cout << "player pos " << player.position.x << ", " << player.position.y << ", " << player.position.z << std::endl;
 
     player.syncCamera();
 }

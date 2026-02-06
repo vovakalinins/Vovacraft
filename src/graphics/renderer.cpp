@@ -36,24 +36,37 @@ void Renderer::updateMeshes(World &world)
         glm::ivec2 pos = chunk->position;
         if (chunk->meshDirty || meshCache.find(pos) == meshCache.end())
         {
-            std::vector<float> vertices = ChunkMesher::generateMesh(world, *chunk);
+            MeshData meshData = ChunkMesher::generateMesh(world, *chunk);
             auto mesh = std::make_unique<ChunkMesh>();
-            mesh->upload(vertices);
+            mesh->upload(meshData.opaqueVerts, meshData.transparentVerts);
             meshCache[pos] = std::move(mesh);
             chunk->meshDirty = false;
         }
     }
 }
 
-void Renderer::render(const Camera &camera, Shader &shader,
-                      const glm::ivec3 &breakTarget, int breakFace, float breakProgress, bool breakValid)
+void Renderer::render(const Camera &camera, Shader &shader, const glm::ivec3 &breakTarget, int breakFace, float breakProgress, bool breakValid)
 {
     for (const auto &pair : meshCache)
     {
         glm::ivec2 pos = pair.first;
         ChunkMesh *mesh = pair.second.get();
-        mesh->render(shader.ID, glm::vec3(pos.x, 0, pos.y));
+        mesh->renderOpaque(shader.ID, glm::vec3(pos.x, 0, pos.y));
     }
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_FALSE);
+
+    for (const auto &pair : meshCache)
+    {
+        glm::ivec2 pos = pair.first;
+        ChunkMesh *mesh = pair.second.get();
+        mesh->renderTransparent(shader.ID, glm::vec3(pos.x, 0, pos.y));
+    }
+
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
 
     if (!breakValid || breakProgress <= 0.0f || breakProgress >= 1.0f)
         return;

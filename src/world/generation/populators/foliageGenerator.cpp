@@ -27,7 +27,7 @@ void generateFoliage(World &world, Chunk &chunk, const siv::PerlinNoise &foliage
                 continue;
 
             std::unique_ptr<Structure> sPtr = std::make_unique<Tree>();
-            sPtr->generate(world, wx, surfaceWorldY, wz);
+            sPtr->generate(world, wx, surfaceWorldY+1, wz);
         }
     }
 }

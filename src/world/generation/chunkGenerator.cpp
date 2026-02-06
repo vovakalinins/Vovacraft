@@ -4,7 +4,6 @@
 #include "world/world/world.h"
 #include <cmath>
 
-
 void ChunkGenerator::makeFlat(Chunk &chunk)
 {
     for (int x = 0; x < CHUNK_SIZE; x++)

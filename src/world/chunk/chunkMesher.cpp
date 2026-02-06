@@ -29,25 +29,23 @@ inline bool shouldRenderFace(const World &world, const Chunk &chunk,
     if (ny < 0 || ny >= CHUNK_HEIGHT)
         return true;
 
+    uint8_t neighbor;
     if (nx >= 0 && nx < CHUNK_SIZE && nz >= 0 && nz < CHUNK_SIZE)
     {
-        uint8_t neighbor = chunk.getBlock(nx, ny, nz);
-        if (neighbor == 0)
-            return true;
-        if (isWater(thisBlock))
-            return neighbor == 0;
-        return isTransparent(neighbor);
+        neighbor = chunk.getBlock(nx, ny, nz);
+    }
+    else
+    {
+        int worldX = chunk.position.x + nx;
+        int worldZ = chunk.position.y + nz;
+        int worldY = y + Y_MIN;
+        neighbor = world.getBlock(worldX, worldY, worldZ);
     }
 
-    int worldX = chunk.position.x + nx;
-    int worldZ = chunk.position.y + nz;
-    int worldY = y + Y_MIN;
-
-    uint8_t neighbor = world.getBlock(worldX, worldY, worldZ);
     if (neighbor == 0)
         return true;
     if (isWater(thisBlock))
-        return neighbor == 0;
+        return false;
     return isTransparent(neighbor);
 }
 
@@ -87,15 +85,19 @@ inline void getVisuals(uint8_t block, int face, int& tex, float& r, float& g, fl
     }
 }
 
-std::vector<float> ChunkMesher::generateMesh(const World &world, const Chunk& chunk) {
-    std::vector<float> verts;
-    verts.reserve(100000);
+MeshData ChunkMesher::generateMesh(const World &world, const Chunk& chunk) {
+    MeshData mesh;
+    mesh.opaqueVerts.reserve(100000);
+    mesh.transparentVerts.reserve(20000);
 
     for (int y = 0; y < CHUNK_HEIGHT; y++) {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 uint8_t block = chunk.getBlock(x, y, z);
                 if (block == 0) continue;
+
+                bool blended = BLOCK_DATABASE[block].alpha < 1.0f;
+                std::vector<float>& verts = blended ? mesh.transparentVerts : mesh.opaqueVerts;
 
                 float worldY = (float)(y + Y_MIN);
                 int tex;
@@ -128,5 +130,5 @@ std::vector<float> ChunkMesher::generateMesh(const World &world, const Chunk& ch
             }
         }
     }
-    return verts;
+    return mesh;
 }

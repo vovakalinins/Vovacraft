@@ -27,45 +27,62 @@ int World::getSurfaceY(const World &world, int worldX, int worldZ)
 
 void World::computeSpawn()
 {
-    int bestX = 0, bestZ = 0;
-    int bestY = SEA_LEVEL + 1;
-    int centerX = 0, centerZ = 0;
-    int count = 0;
-    for (const auto &c : chunks)
+    if (chunks.empty())
     {
-        centerX += c->position.x;
-        centerZ += c->position.y;
-        count++;
+        worldSpawn = glm::ivec3(0, SEA_LEVEL + 1, 0);
+        return;
     }
-    if (count > 0)
+
+    int minX = chunks[0]->position.x;
+    int maxX = minX + CHUNK_SIZE;
+    int minZ = chunks[0]->position.y;
+    int maxZ = minZ + CHUNK_SIZE;
+    for (size_t i = 1; i < chunks.size(); i++)
     {
-        centerX = centerX / count + CHUNK_SIZE / 2;
-        centerZ = centerZ / count + CHUNK_SIZE / 2;
+        if (chunks[i]->position.x < minX) minX = chunks[i]->position.x;
+        if (chunks[i]->position.x + CHUNK_SIZE > maxX) maxX = chunks[i]->position.x + CHUNK_SIZE;
+        if (chunks[i]->position.y < minZ) minZ = chunks[i]->position.y;
+        if (chunks[i]->position.y + CHUNK_SIZE > maxZ) maxZ = chunks[i]->position.y + CHUNK_SIZE;
     }
-    int bestDist = -1;
-    for (const auto &c : chunks)
+
+    int centerX = (minX + maxX) / 2;
+    int centerZ = (minZ + maxZ) / 2;
+
+    int surfaceY = getSurfaceY(*this, centerX, centerZ);
+    if (surfaceY >= 0)
     {
-        for (int lx = 0; lx < CHUNK_SIZE; lx++)
+        worldSpawn = glm::ivec3(centerX, surfaceY + 1, centerZ);
+        return;
+    }
+
+    int maxR = ((maxX - minX) > (maxZ - minZ) ? (maxX - minX) : (maxZ - minZ)) / 2 + 1;
+    for (int r = 1; r <= maxR; r++)
+    {
+        for (int i = -r; i <= r; i++)
         {
-            for (int lz = 0; lz < CHUNK_SIZE; lz++)
-            {
-                int wx = c->position.x + lx;
-                int wz = c->position.y + lz;
-                int surfaceY = getSurfaceY(*this, wx, wz);
-                if (surfaceY < 0)
-                    continue;
-                int dist = (wx - centerX) * (wx - centerX) + (wz - centerZ) * (wz - centerZ);
-                if (bestDist < 0 || dist < bestDist)
-                {
-                    bestDist = dist;
-                    bestX = wx;
-                    bestZ = wz;
-                    bestY = surfaceY + 1;
-                }
-            }
+            int wx = centerX + i;
+            int wz = centerZ - r;
+            surfaceY = getSurfaceY(*this, wx, wz);
+            if (surfaceY >= 0) { worldSpawn = glm::ivec3(wx, surfaceY + 1, wz); return; }
+
+            wz = centerZ + r;
+            surfaceY = getSurfaceY(*this, wx, wz);
+            if (surfaceY >= 0) { worldSpawn = glm::ivec3(wx, surfaceY + 1, wz); return; }
+        }
+        for (int i = -r + 1; i < r; i++)
+        {
+            int wx = centerX - r;
+            int wz = centerZ + i;
+            surfaceY = getSurfaceY(*this, wx, wz);
+            if (surfaceY >= 0) { worldSpawn = glm::ivec3(wx, surfaceY + 1, wz); return; }
+
+            wx = centerX + r;
+            surfaceY = getSurfaceY(*this, wx, wz);
+            if (surfaceY >= 0) { worldSpawn = glm::ivec3(wx, surfaceY + 1, wz); return; }
         }
     }
-    worldSpawn = glm::ivec3(bestX, bestY, bestZ);
+
+    worldSpawn = glm::ivec3(centerX, SEA_LEVEL + 1, centerZ);
 }
 
 void World::addChunk(std::unique_ptr<Chunk> chunk)

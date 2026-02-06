@@ -9,7 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <filesystem>
-#include <fstream> // Required for basic file I/O
+#include <fstream>
 #include "core/GameState.h"
 #include "core/input.h"
 #include "world/world/world.h"
@@ -82,19 +82,28 @@ int main()
 
     // Chunk chunk(glm::vec3(0,0,0));
     srand(static_cast<unsigned int>(time(0)));
-    uint_fast32_t ranSeed = static_cast<uint_fast32_t>(rand() % 101);
+    uint_fast32_t ranSeed = static_cast<uint_fast32_t>(rand() % 10001);
 
-    WorldGenerator::generateSeededWorld(state.world, 4, 4, ranSeed);
+    WorldGenerator::generateSeededWorld(state.world, 8, 8, ranSeed);
+    std::cout << "generated world with seed: " << ranSeed << std::endl;
+
+    auto start = std::chrono::high_resolution_clock::now();
+
     state.world.computeSpawn();
     state.player.position = glm::vec3(
-        state.world.worldSpawn.x,
-        state.world.worldSpawn.y+1,
-        state.world.worldSpawn.z);
+        state.world.worldSpawn.x + 0.5f,
+        state.world.worldSpawn.y + 0.01f,
+        state.world.worldSpawn.z + 0.5f);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "compute spawn timer took " << elapsed.count() << "ms" << std::endl;
+
     state.player.syncCamera();
 
     Renderer renderer;
     UIRenderer uiRenderer;
     uiRenderer.init();
+
     unsigned int hotbarTexture = loadUITexture("./assets/Hotbar.png");
     unsigned int selectionTexture = loadUITexture("./assets/Hotbar_selection.png");
     unsigned int crosshairTexture = loadUITexture("./assets/Crosshair.png");
@@ -137,13 +146,8 @@ int main()
 
         ourShader.setMat4("projection", projection);
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         renderer.render(state.player.camera, ourShader,
-            state.breakTarget, state.breakFace, state.breakProgress, state.breakValid);
-
-        glDisable(GL_BLEND);
+                        state.breakTarget, state.breakFace, state.breakProgress, state.breakValid);
 
         uiRenderer.renderHotbar(hotbarTexture, selectionTexture, state.selectedSlot,
                                 state.screenWidth, state.screenHeight);
